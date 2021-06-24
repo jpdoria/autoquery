@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: autoquery
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: client-dev # change me
+  namespace: autoquery
+spec:
+  schedule: "0 0 1 * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: client-dev # change me
+              image: autoquery # change me
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: ATHENA_DATABASE
+                  value: dummy_db # change me
+                - name: ATHENA_TABLE
+                  value: dummy_table # change me
+                - name: AWS_REGION
+                  value: us-east-1 # change me
+                - name: PROJECT_PREFIX
+                  value: client-dev # change me
+                - name: S3_BUCKET
+                  value: s3://dummy_bucket # change me
+                # - name: AWS_ACCESS_KEY_ID # for local testing (minikube)
+                #  value: # change me
+                # - name: AWS_SECRET_ACCESS_KEY # for local testing (minikube)
+                #  value: # change me
+          restartPolicy: Never
